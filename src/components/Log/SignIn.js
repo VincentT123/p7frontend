@@ -36,6 +36,8 @@ const SignIn = () => {
           console.log("data : ", res.data)
           user.setUserId(res.data.userId)
           user.setUserToken(res.data.token)
+          user.setUserNom(res.data.nom)
+          user.setUserPrenom(res.data.prenom)
           navigate("/posts")
         }
       })
