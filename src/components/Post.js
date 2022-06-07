@@ -2,20 +2,42 @@ import { useContext, useState } from "react"
 import { UserContext } from '../components/AppContext'
 import axios from 'axios'
 
-const Post = ({ post }) => {
+const Post = ({ post, postsData, setPostsData }) => {
   const user = useContext(UserContext)
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState("")
+
+  console.log("user.uid : ", user.uid, " - post.user_id : ", post.user_id)
+  const isAuthor = (post.user_id === user.uid)
+  console.log("isAuthor : ", isAuthor)
+
 
   const addComment = () => {
 
   }
 
-  const edit = () => {
-
+  const editPost = () => {
+    const url = `${process.env.REACT_APP_API_URL}groupomania/posts/updatepost`
+    const token = user.utoken
+    const postId = post.id
+    const text = editContent
+    axios({
+      method: 'put',
+      url: url,
+      headers: { 'authorization': token },
+      data: {
+        id: postId,
+        texte: text
+      }
+      //withCredentials: true
+    })
+      .then(() => {
+        setIsEditing(false)
+        post.texte = editContent
+      })
   }
 
-  const remove = () => {
+  const removePost = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/posts/deletepost`
     const token = user.utoken
     const postId = post.id
@@ -28,7 +50,14 @@ const Post = ({ post }) => {
       }
       //withCredentials: true
     })
-      .then(() => { })
+      .then(() => {
+        //const postToDelete = document.getElementById(post.id)
+        //postToDelete.remove() 
+        console.log("postsData avant remove :", postsData)
+        const tab = postsData.filter((item) => item.id !== post.id)
+        console.log("postsData après remove :", postsData)
+        setPostsData(tab)
+      })
   }
 
   const dateFormat = (date) => {
@@ -44,7 +73,7 @@ const Post = ({ post }) => {
   }
 
   return (
-    <li className="post" style={{ background: isEditing ? "#f3feff" : "white" }}>
+    <li className="post" style={{ background: isEditing ? "#f3feff" : "white" }} id={post.id}>
 
       <div className="post-header">
         <h3>{post.user_name}</h3>
@@ -53,6 +82,7 @@ const Post = ({ post }) => {
 
       {isEditing ? (
         <textarea
+          spellCheck="false"
           defaultValue={editContent ? editContent : post.texte}
           autoFocus
           onChange={(e) => setEditContent(e.target.value)}>
@@ -70,16 +100,14 @@ const Post = ({ post }) => {
         </div>
 
         <div className="post-maj-btn">
-          {isEditing ? (
-            <button onClick={() => edit()}>Valider</button>
-          ) : (
-            <button onClick={() => setIsEditing(true)}>Edit</button>
+          {(isAuthor && isEditing) ? (
+            <button onClick={() => editPost()}>Valider</button>
+          ) : (isAuthor &&
+            <button onClick={() => setIsEditing(true)}>Editer</button>
           )}
-          <button onClick={() => {
-            if (window.confirm("Voulez-vous vraiment supprimer cet article ?")) {
-              remove()
-            }
-          }}>Supprimer</button>
+          {isAuthor &&
+            <button onClick={() => removePost()}>Supprimer</button>
+          }
 
         </div>
 

@@ -27,7 +27,6 @@ const Posts = () => {
         url: url,
         headers: { 'authorization': token },
         data: {
-          date_cre: "2022-06-03 15:02:33",
           texte: content,
           user_id: user.uid,
           user_name: uname
@@ -66,13 +65,13 @@ const Posts = () => {
     <div className="posts-page">
       <div className="posts-page-header">
         <button type="button" onClick={() => setIsCreating(true)} className="btn-create-post">ECRIRE UN COMMENTAIRE</button>
-        <button type="button" onClick={refresh} className="btn-refresh">ACTUALISER</button>
+        <button type="button" onClick={() => getData()} className="btn-refresh">ACTUALISER</button>
       </div>
       <br />
       {isCreating &&
         <form action="" onSubmit={(e) => createPost(e)}>
           <textarea
-            spellcheck="false"
+            spellCheck="false"
             style={{ border: error ? "1px solid red" : "1px solid #61dafb" }}
             placeholder="Message"
             onChange={(e) => setContent(e.target.value)}
@@ -87,7 +86,7 @@ const Posts = () => {
         {postsData
           .sort((a, b) => b.date_cre - a.date_cre)
           .map((post) => (
-            <Post key={post.id} post={post} />
+            <Post key={post.id} post={post} postsData={postsData} setPostsData={setPostsData} />
           ))}
       </ul>
     </div>
