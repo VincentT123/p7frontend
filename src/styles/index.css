@@ -186,7 +186,7 @@ nav {
   background-color: #FD2D01;
 }
 
-input[type=submit] {
+.log-form-container input[type=submit] {
   width: 100%;
   border-radius: 3px;
   height: 30px;
@@ -196,7 +196,7 @@ input[type=submit] {
   background-color: #FFD7D7;
 }
 
-input[type=submit]:hover {
+.log-form-container input[type=submit]:hover {
   color: #FFD7D7;
   background-color: #FD2D01;
 }
@@ -247,7 +247,7 @@ input[type=submit]:hover {
 }
 
 .btn-refresh:hover {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
 .posts-page form {
@@ -267,11 +267,44 @@ input[type=submit]:hover {
   border: 1px solid #FFD7D7;
 }
 
+.create-post-footer {
+  display: flex;
+  justify-content: space-between;
+  column-gap: 20px;
+  align-items: baseline;
+
+}
+
+.create-post-submit {
+  border-radius: 3px;
+  height: 30px;
+  min-width: 130px;
+  color: #4E5166;
+  background-color: #FFD7D7;
+}
+
+.create-post-submit:hover {
+  color: #FFD7D7;
+  background-color: #FD2D01;
+}
+
+.create-post-cancel {
+  border-radius: 3px;
+  height: 30px;
+  min-width: 130px;
+  color: #4E5166;
+  background-color: #e0e4eb;
+}
+
+.create-post-cancel:hover {
+  color: #4E5166;
+  background-color: #d1d7e0;
+}
+
 .posts-page ul li {
   margin-top: 20px;
   padding: 10px 12px 12px;
   border: 1px solid #FFD7D7;
-
 }
 
 .posts-page ul li textarea {
@@ -301,6 +334,22 @@ input[type=submit]:hover {
   justify-content: space-between;
 }
 
+.thumb-up {
+  cursor: pointer;
+}
+
+.thumb-down {
+  cursor: pointer;
+}
+
+.liked {
+  color: #FD2D01;
+}
+
+.disliked {
+  color: #FD2D01;
+}
+
 .post-maj-btn {
   display: flex;
   justify-content: space-between;
@@ -317,3 +366,7 @@ input[type=submit]:hover {
 .post button:hover {
   color: #FD2D01;
 }
+
+/*--------------------------*/
+/*     comments section     */
+/*--------------------------*/
