@@ -370,3 +370,7 @@ nav {
 /*--------------------------*/
 /*     comments section     */
 /*--------------------------*/
+
+.comment {
+  border: 1px solid yellow;
+}

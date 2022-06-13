@@ -1,7 +1,7 @@
 import { useContext, useState } from "react"
 import { UserContext } from '../components/AppContext'
 import axios from 'axios'
-import Comment from "./Comment"
+import Comment from '../components/Comment'
 
 const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDislikes, setUserDislikes }) => {
   const user = useContext(UserContext)
@@ -10,12 +10,8 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
   const [isComments, setIsComments] = useState(false)
   const [commentsData, setCommentsData] = useState([])
   const isAuthor = (post.user_id === user.uid)
-  console.log("userLikes : ", userLikes)
-  console.log("userDislikes : ", userDislikes)
   const [isLiked, setIsLiked] = useState(userLikes.includes(post.id))
   const [isDisliked, setIsDisliked] = useState(userDislikes.includes(post.id))
-  console.log("isLiked : ", isLiked)
-  console.log("isDisliked : ", isDisliked)
 
   const likePost = (act) => {
     if (post.user_id === user.uid) {
@@ -86,19 +82,25 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       })
   }
 
-  const listComments = () => {
-    isComments ? setIsComments(false) : setIsComments(true)
-    if (!isComments) { return }
-    const url = `${process.env.REACT_APP_API_URL}groupomania/posts/listcomments`
+  const getComments = () => {
+    const url = `${process.env.REACT_APP_API_URL}groupomania/comments/listcomments`
     const token = user.utoken
+    const postId = post.id
+    console.log("post_id : ", postId)
     axios({
-      method: 'get',
+      method: 'post',
       url: url,
-      headers: { 'authorization': token }
-      //withCredentials: true
+      headers: { 'authorization': token },
+      data: {
+        post_id: postId
+      }
     })
       .then((res) => {
+        console.log("data results : ", res.data.results)
         setCommentsData(res.data.results)
+        setIsComments(true)
+        console.log("commentsData : ", commentsData)
+        console.log("isComments : ", isComments)
       })
       .catch((err) => console.log("erreur axios listcomments : ", err))
   }
@@ -124,10 +126,6 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       })
   }
 
-  const cancelPost = () => {
-    setEditContent("")
-    setIsEditing(false)
-  }
 
   const removePost = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/posts/deletepost`
@@ -184,7 +182,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
         <div className="post-likes">
           {post.likes}&nbsp;&nbsp;<i onClick={() => likePost(1)} className={`${isLiked ? "fas liked " : "far "} fa-thumbs-up thumb-up`}></i> | &nbsp;&nbsp;
           {post.dislikes}&nbsp;&nbsp;<i onClick={() => likePost(-1)} className={`${isDisliked ? "fas disliked " : "far "} fa-thumbs-down thumb-down`}></i> | &nbsp;&nbsp;
-          <button onClick={() => listComments()}>{post.comments}&nbsp;&nbsp;Commentaires</button>
+          <button onClick={() => getComments()}>{post.comments}&nbsp;&nbsp;Commentaires</button>
 
           {isComments &&
             <ul>
