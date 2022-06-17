@@ -12,6 +12,9 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
   const isAuthor = (post.user_id === user.uid)
   const [isLiked, setIsLiked] = useState(userLikes.includes(post.id))
   const [isDisliked, setIsDisliked] = useState(userDislikes.includes(post.id))
+  // likes à passer dans le contexte ?
+  const [userLikesC, setUserLikesC] = useState([])
+  const [userDislikesC, setUserDislikesC] = useState([])
 
   const likePost = (act) => {
     if (post.user_id === user.uid) {
@@ -83,6 +86,12 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
   }
 
   const getComments = () => {
+    console.log("isComments avant if : ", isComments)
+    if (isComments) {
+      setIsComments(false)
+      console.log("isComments dans if : ", isComments)
+      return
+    }
     const url = `${process.env.REACT_APP_API_URL}groupomania/comments/listcomments`
     const token = user.utoken
     const postId = post.id
@@ -96,13 +105,33 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       }
     })
       .then((res) => {
+
         console.log("data results : ", res.data.results)
         setCommentsData(res.data.results)
         setIsComments(true)
         console.log("commentsData : ", commentsData)
         console.log("isComments : ", isComments)
+        //e.preventDefault()
       })
       .catch((err) => console.log("erreur axios listcomments : ", err))
+  }
+
+  const getLikesC = () => {
+    const url = `${process.env.REACT_APP_API_URL}groupomania/comments/userlikes`
+    const token = user.utoken
+    console.log("id : ", user.uid)
+    axios({
+      method: 'post',
+      url: url,
+      headers: { 'authorization': token },
+      data: { id: user.uid }
+      //withCredentials: true
+    })
+      .then((res) => {
+        setUserLikesC(Array.from(res.data.results.filter(item => item.action === 1), item => item.comment_id))
+        setUserDislikesC(Array.from(res.data.results.filter(item => item.action === -1), item => item.comment_id))
+      })
+      .catch((err) => console.log("erreur axios userlikes comments : ", err))
   }
 
   const editPost = () => {
@@ -146,6 +175,10 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       })
   }
 
+  const reply = () => {
+
+  }
+
   const dateFormat = (date) => {
     let newDate = new Date(date).toLocaleDateString("fr-FR", {
       year: "numeric",
@@ -182,14 +215,17 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
         <div className="post-likes">
           {post.likes}&nbsp;&nbsp;<i onClick={() => likePost(1)} className={`${isLiked ? "fas liked " : "far "} fa-thumbs-up thumb-up`}></i> | &nbsp;&nbsp;
           {post.dislikes}&nbsp;&nbsp;<i onClick={() => likePost(-1)} className={`${isDisliked ? "fas disliked " : "far "} fa-thumbs-down thumb-down`}></i> | &nbsp;&nbsp;
-          <button onClick={() => getComments()}>{post.comments}&nbsp;&nbsp;Commentaires</button>
+          <button onClick={() => { getComments(); getLikesC() }}>{post.comments}&nbsp;&nbsp;Commentaires</button>
+          <span onClick={reply} className="reply">Répondre</span>
 
           {isComments &&
             <ul>
               {commentsData
                 .sort((a, b) => b.date_cre - a.date_cre)
                 .map((comment) => (
-                  <Comment key={comment.id} comment={comment} commentsData={commentsData} setCommentsData={setCommentsData} />
+                  <Comment key={comment.id} comment={comment} commentsData={commentsData} setCommentsData={setCommentsData}
+                    userLikesC={userLikesC} setUserLikesC={setUserLikesC}
+                    userDislikesC={userDislikesC} setUserDislikesC={setUserDislikesC} />
                 ))}
             </ul>
           }

@@ -2,7 +2,7 @@ import { useContext, useState } from "react"
 import { UserContext } from '../components/AppContext'
 import axios from 'axios'
 
-const Comment = (comment, commentsData, setCommentsData) => {
+const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLikesC, userDislikesC, setUserDislikesC }) => {
   const user = useContext(UserContext)
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState("")
@@ -10,10 +10,12 @@ const Comment = (comment, commentsData, setCommentsData) => {
   //const [isLiked, setIsLiked] = useState(userLikes.includes(comment.id))
   //const [isDisliked, setIsDisliked] = useState(userDislikes.includes(comment.id))
   // temp : -> passer les likes/dislikes dans le contexte user
-  const [userLikes, setUserLikes] = useState([])
-  const [userDislikes, setUserDislikes] = useState([])
-  const [isLiked, setIsLiked] = useState(false)
-  const [isDisliked, setIsDisliked] = useState(false)
+  //const [userLikes, setUserLikes] = useState([])
+  //const [userDislikes, setUserDislikes] = useState([])
+  console.log("userLikesC : ", userLikesC)
+  const [isLiked, setIsLiked] = useState(userLikesC.includes(comment.id))
+  const [isDisliked, setIsDisliked] = useState(userDislikesC.includes(comment.id))
+  console.log("isLiked : ", isLiked)
 
   const likeComment = (act) => {
     if (comment.user_id === user.uid) {
@@ -28,33 +30,33 @@ const Comment = (comment, commentsData, setCommentsData) => {
     const userId = user.uid
     console.log("front action : ", action)
     axios({
-      method: 'comment',
+      method: 'post',
       url: url,
       headers: { 'authorization': token },
       data: {
-        pid: commentId,
+        cid: commentId,
         uid: userId,
         act: action
       }
     })
       .then(() => {
         console.log("retour like")
-        const tabLikes = userLikes
-        const tabDislikes = userDislikes
+        const tabLikes = userLikesC
+        const tabDislikes = userDislikesC
         switch (act) {
           case 1:
             if (isLiked) {
               comment.likes = comment.likes - 1
-              setUserLikes(tabLikes.filter(item => item !== comment.id))
+              setUserLikesC(tabLikes.filter(item => item !== comment.id))
               setIsLiked(false)
             } else {
               comment.likes = comment.likes + 1
               tabLikes.push(comment.id)
-              setUserLikes(tabLikes)
+              setUserLikesC(tabLikes)
               setIsLiked(true)
               if (isDisliked) {
                 comment.dislikes = comment.dislikes - 1
-                setUserDislikes(tabDislikes.filter(item => item !== comment.id))
+                setUserDislikesC(tabDislikes.filter(item => item !== comment.id))
                 setIsDisliked(false)
               }
             }
@@ -62,16 +64,16 @@ const Comment = (comment, commentsData, setCommentsData) => {
           case -1:
             if (isDisliked) {
               comment.dislikes = comment.dislikes - 1
-              setUserDislikes(tabDislikes.filter(item => item !== comment.id))
+              setUserDislikesC(tabDislikes.filter(item => item !== comment.id))
               setIsDisliked(false)
             } else {
               comment.dislikes = comment.dislikes + 1
               tabDislikes.push(comment.id)
-              setUserDislikes(tabDislikes)
+              setUserDislikesC(tabDislikes)
               setIsDisliked(true)
               if (isLiked) {
                 comment.likes = comment.likes - 1
-                setUserLikes(tabLikes.filter(item => item !== comment.id))
+                setUserLikesC(tabLikes.filter(item => item !== comment.id))
                 setIsLiked(false)
               }
             }
@@ -79,7 +81,7 @@ const Comment = (comment, commentsData, setCommentsData) => {
           default:
             console.log("wrong act value")
         }
-        console.log("retour userLikes : ", userLikes)
+        console.log("retour userLikes : ", userLikesC)
         console.log("retour isLiked : ", isLiked)
       })
   }
@@ -124,6 +126,10 @@ const Comment = (comment, commentsData, setCommentsData) => {
       })
   }
 
+  const reply = () => {
+
+  }
+
   const dateFormat = (date) => {
     let newDate = new Date(date).toLocaleDateString("fr-FR", {
       year: "numeric",
@@ -141,7 +147,7 @@ const Comment = (comment, commentsData, setCommentsData) => {
 
       <div className="post-header">
         <h3>{comment.user_name}</h3>
-        <em>Commenté le {dateFormat(comment.date_cre)}</em>
+        <em>Posté le {dateFormat(comment.date_cre)}</em>
       </div>
 
       {isEditing ? (
@@ -160,6 +166,7 @@ const Comment = (comment, commentsData, setCommentsData) => {
         <div className="post-likes">
           {comment.likes}&nbsp;&nbsp;<i onClick={() => likeComment(1)} className={`${isLiked ? "fas liked " : "far "} fa-thumbs-up thumb-up`}></i> | &nbsp;&nbsp;
           {comment.dislikes}&nbsp;&nbsp;<i onClick={() => likeComment(-1)} className={`${isDisliked ? "fas disliked " : "far "} fa-thumbs-down thumb-down`}></i> | &nbsp;&nbsp;
+          <span onClick={reply} className="reply">Répondre</span>
         </div>
 
         <div className="post-maj-btn">

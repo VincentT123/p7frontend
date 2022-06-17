@@ -367,6 +367,16 @@ nav {
   color: #FD2D01;
 }
 
+.reply {
+  font-size: 0.85em;
+  padding-left: 12px;
+  cursor: pointer;
+}
+
+.reply:hover {
+  color: #FD2D01;
+}
+
 /*--------------------------*/
 /*     comments section     */
 /*--------------------------*/
