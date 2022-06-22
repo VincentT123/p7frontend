@@ -2,7 +2,7 @@ import { useContext, useState } from "react"
 import { UserContext } from '../components/AppContext'
 import axios from 'axios'
 
-const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLikesC, userDislikesC, setUserDislikesC }) => {
+const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLikesC, userDislikesC, setUserDislikesC, isReplying, setIsReplying, postsData, setPostsData }) => {
   const user = useContext(UserContext)
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState("")
@@ -12,6 +12,7 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
   // temp : -> passer les likes/dislikes dans le contexte user
   //const [userLikes, setUserLikes] = useState([])
   //const [userDislikes, setUserDislikes] = useState([])
+  console.log("comment id : ", comment.id)
   console.log("userLikesC : ", userLikesC)
   const [isLiked, setIsLiked] = useState(userLikesC.includes(comment.id))
   const [isDisliked, setIsDisliked] = useState(userDislikesC.includes(comment.id))
@@ -28,7 +29,6 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
     const token = user.utoken
     const commentId = comment.id
     const userId = user.uid
-    console.log("front action : ", action)
     axios({
       method: 'post',
       url: url,
@@ -40,7 +40,6 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
       }
     })
       .then(() => {
-        console.log("retour like")
         const tabLikes = userLikesC
         const tabDislikes = userDislikesC
         switch (act) {
@@ -81,8 +80,6 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
           default:
             console.log("wrong act value")
         }
-        console.log("retour userLikes : ", userLikesC)
-        console.log("retour isLiked : ", isLiked)
       })
   }
 
@@ -99,7 +96,6 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
         id: commentId,
         texte: text
       }
-      //withCredentials: true
     })
       .then(() => {
         setIsEditing(false)
@@ -111,23 +107,31 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
     const url = `${process.env.REACT_APP_API_URL}groupomania/comments/deletecomment`
     const token = user.utoken
     const commentId = comment.id
+    const postId = comment.post_id
     axios({
       method: 'delete',
       url: url,
       headers: { 'authorization': token },
       data: {
-        id: commentId
+        id: commentId,
+        post_id: postId
       }
-      //withCredentials: true
     })
       .then(() => {
-        const tab = commentsData.filter((item) => item.id !== comment.id)
-        setCommentsData(tab)
+        const tabComments = commentsData.filter((item) => item.id !== comment.id)
+        setCommentsData(tabComments)
+        let tabPosts = postsData
+        tabPosts.map((item) => {
+          if (item.id === comment.post_id) {
+            item.comments = item.comments - 1
+          }
+        })
+        setPostsData(tabPosts)
       })
   }
 
   const reply = () => {
-
+    setIsReplying(true)
   }
 
   const dateFormat = (date) => {
@@ -145,7 +149,7 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
   return (
     <li className="comment" style={{ background: isEditing ? "#f3feff" : "white" }} id={comment.id}>
 
-      <div className="post-header">
+      <div className="comment-header">
         <h3>{comment.user_name}</h3>
         <em>Posté le {dateFormat(comment.date_cre)}</em>
       </div>
@@ -158,18 +162,18 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
           onChange={(e) => setEditContent(e.target.value)}>
         </textarea>
       ) : (
-        <p>{editContent ? editContent : comment.texte}</p>
+        <p className="comment-content">{editContent ? editContent : comment.texte}</p>
       )}
 
-      <div className="post-footer">
+      <div className="comment-footer">
 
-        <div className="post-likes">
+        <div className="comment-likes">
           {comment.likes}&nbsp;&nbsp;<i onClick={() => likeComment(1)} className={`${isLiked ? "fas liked " : "far "} fa-thumbs-up thumb-up`}></i> | &nbsp;&nbsp;
           {comment.dislikes}&nbsp;&nbsp;<i onClick={() => likeComment(-1)} className={`${isDisliked ? "fas disliked " : "far "} fa-thumbs-down thumb-down`}></i> | &nbsp;&nbsp;
           <span onClick={reply} className="reply">Répondre</span>
         </div>
 
-        <div className="post-maj-btn">
+        <div className="comment-maj-btn">
           {(isAuthor && isEditing) ? (
             <>
               <button onClick={() => editComment()}>Valider</button>

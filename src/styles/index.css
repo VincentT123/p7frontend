@@ -301,7 +301,7 @@ nav {
   background-color: #d1d7e0;
 }
 
-.posts-page ul li {
+.post {
   margin-top: 20px;
   padding: 10px 12px 12px;
   border: 1px solid #FFD7D7;
@@ -324,9 +324,8 @@ nav {
   justify-content: space-between;
 }
 
-.posts-page ul li p {
+.post-content {
   padding: 20px 12px 30px;
-  /*border: 1px solid #FFD7D7;*/
 }
 
 .post-footer {
@@ -374,7 +373,7 @@ nav {
 }
 
 .reply:hover {
-  color: #FD2D01;
+  color: #7d819b;
 }
 
 /*--------------------------*/
@@ -382,5 +381,38 @@ nav {
 /*--------------------------*/
 
 .comment {
-  border: 1px solid yellow;
+  border-top: 1px solid #FFD7D7;
+  margin-top: 20px;
+  padding: 10px 12px 0px;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.comment-content {
+  padding: 20px 12px 30px;
+}
+
+.comment-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.comment-maj-btn {
+  display: flex;
+  justify-content: space-between;
+  column-gap: 20px;
+}
+
+.comment button {
+  border-radius: 3px;
+  padding: 3px 10px 4px;
+  color: #4E5166;
+  background-color: #FFD7D7;
+}
+
+.comment button:hover {
+  color: #FD2D01;
 }

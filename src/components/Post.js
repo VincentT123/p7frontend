@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { UserContext } from '../components/AppContext'
 import axios from 'axios'
 import Comment from '../components/Comment'
@@ -7,6 +7,9 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
   const user = useContext(UserContext)
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState("")
+  const [isReplying, setIsReplying] = useState(false)
+  const [replyContent, setReplyContent] = useState("")
+  const [errorReply, setErrorReply] = useState(false)
   const [isComments, setIsComments] = useState(false)
   const [commentsData, setCommentsData] = useState([])
   const isAuthor = (post.user_id === user.uid)
@@ -27,7 +30,6 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
     const token = user.utoken
     const postId = post.id
     const userId = user.uid
-    console.log("front action : ", action)
     axios({
       method: 'post',
       url: url,
@@ -39,7 +41,6 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       }
     })
       .then(() => {
-        console.log("retour like")
         const tabLikes = userLikes
         const tabDislikes = userDislikes
         switch (act) {
@@ -80,18 +81,14 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
           default:
             console.log("wrong act value")
         }
-        console.log("retour userLikes : ", userLikes)
-        console.log("retour isLiked : ", isLiked)
       })
   }
 
-  const getComments = () => {
-    console.log("isComments avant if : ", isComments)
-    if (isComments) {
+  const getComments = (flag) => {
+    /*if (isComments && flag === 0) {
       setIsComments(false)
-      console.log("isComments dans if : ", isComments)
       return
-    }
+    }*/
     const url = `${process.env.REACT_APP_API_URL}groupomania/comments/listcomments`
     const token = user.utoken
     const postId = post.id
@@ -105,33 +102,39 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       }
     })
       .then((res) => {
-
-        console.log("data results : ", res.data.results)
         setCommentsData(res.data.results)
-        setIsComments(true)
-        console.log("commentsData : ", commentsData)
-        console.log("isComments : ", isComments)
-        //e.preventDefault()
+        //setIsComments(true)
       })
       .catch((err) => console.log("erreur axios listcomments : ", err))
   }
 
   const getLikesC = () => {
+    // conditionner l'accès db avec isComments
     const url = `${process.env.REACT_APP_API_URL}groupomania/comments/userlikes`
     const token = user.utoken
-    console.log("id : ", user.uid)
     axios({
       method: 'post',
       url: url,
       headers: { 'authorization': token },
       data: { id: user.uid }
-      //withCredentials: true
     })
       .then((res) => {
         setUserLikesC(Array.from(res.data.results.filter(item => item.action === 1), item => item.comment_id))
         setUserDislikesC(Array.from(res.data.results.filter(item => item.action === -1), item => item.comment_id))
+        setIsComments(true)
       })
       .catch((err) => console.log("erreur axios userlikes comments : ", err))
+  }
+
+  /*useEffect(() => getComments(), [])
+  useEffect(() => getLikesC(), [])*/
+  const getCommentsData = (flag) => {
+    if (isComments && flag === 0) {
+      setIsComments(false)
+      return
+    }
+    getComments()
+    getLikesC()
   }
 
   const editPost = () => {
@@ -147,14 +150,12 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
         id: postId,
         texte: text
       }
-      //withCredentials: true
     })
       .then(() => {
         setIsEditing(false)
         post.texte = editContent
       })
   }
-
 
   const removePost = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/posts/deletepost`
@@ -167,7 +168,6 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       data: {
         id: postId
       }
-      //withCredentials: true
     })
       .then(() => {
         const tab = postsData.filter((item) => item.id !== post.id)
@@ -175,8 +175,35 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       })
   }
 
-  const reply = () => {
-
+  const createComment = (e) => {
+    e.preventDefault()
+    if (replyContent.length > 2000) {
+      setErrorReply(true)
+    } else {
+      const url = `${process.env.REACT_APP_API_URL}groupomania/comments/createcomment`
+      const token = user.utoken
+      const uname = user.uprenom + " " + user.unom
+      axios({
+        method: 'post',
+        url: url,
+        headers: { 'authorization': token },
+        data: {
+          texte: replyContent,
+          post_id: post.id,
+          user_id: user.uid,
+          user_name: uname
+        }
+      })
+        .then((res) => {
+          setIsReplying(false)
+          setErrorReply(false)
+          setReplyContent("")
+          post.comments = post.comments + 1
+          /*getComments(1)
+          getLikesC()*/
+          getCommentsData(1)
+        })
+    }
   }
 
   const dateFormat = (date) => {
@@ -207,7 +234,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
           onChange={(e) => setEditContent(e.target.value)}>
         </textarea>
       ) : (
-        <p>{editContent ? editContent : post.texte}</p>
+        <p className="post-content">{editContent ? editContent : post.texte}</p>
       )}
 
       <div className="post-footer">
@@ -215,21 +242,8 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
         <div className="post-likes">
           {post.likes}&nbsp;&nbsp;<i onClick={() => likePost(1)} className={`${isLiked ? "fas liked " : "far "} fa-thumbs-up thumb-up`}></i> | &nbsp;&nbsp;
           {post.dislikes}&nbsp;&nbsp;<i onClick={() => likePost(-1)} className={`${isDisliked ? "fas disliked " : "far "} fa-thumbs-down thumb-down`}></i> | &nbsp;&nbsp;
-          <button onClick={() => { getComments(); getLikesC() }}>{post.comments}&nbsp;&nbsp;Commentaires</button>
-          <span onClick={reply} className="reply">Répondre</span>
-
-          {isComments &&
-            <ul>
-              {commentsData
-                .sort((a, b) => b.date_cre - a.date_cre)
-                .map((comment) => (
-                  <Comment key={comment.id} comment={comment} commentsData={commentsData} setCommentsData={setCommentsData}
-                    userLikesC={userLikesC} setUserLikesC={setUserLikesC}
-                    userDislikesC={userDislikesC} setUserDislikesC={setUserDislikesC} />
-                ))}
-            </ul>
-          }
-
+          <button onClick={() => { getCommentsData(0) }}>{post.comments}&nbsp;&nbsp;Commentaires</button>
+          <span onClick={() => setIsReplying(true)} className="reply">Répondre</span>
         </div>
 
         <div className="post-maj-btn">
@@ -247,10 +261,43 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
           {isAuthor &&
             <button onClick={() => removePost()}>Supprimer</button>
           }
-
         </div>
 
       </div>
+
+      {isComments &&
+        <ul>
+          {commentsData
+            .sort((a, b) => b.date_cre - a.date_cre)
+            .map((comment) => (
+              <Comment key={comment.id} comment={comment} commentsData={commentsData} setCommentsData={setCommentsData}
+                userLikesC={userLikesC} setUserLikesC={setUserLikesC}
+                userDislikesC={userDislikesC} setUserDislikesC={setUserDislikesC}
+                isReplying={isReplying} setIsReplying={setIsReplying}
+                postsData={postsData} setPostsData={setPostsData} />
+            ))}
+        </ul>
+      }
+
+      {isReplying &&
+        <form action="" onSubmit={(e) => createComment(e)} id="form-create-comment">
+          <textarea
+            spellCheck="false"
+            style={{ border: errorReply ? "1px solid red" : "1px solid #61dafb" }}
+            placeholder="Message"
+            onChange={(e) => setReplyContent(e.target.value)}
+            value={replyContent}>
+          </textarea>
+          {errorReply && <p>Veuillez ne pas dépasser 2000 caractères</p>}
+          <div className="create-post-footer">
+            <input type="submit" value="Envoyer" className="create-post-submit" />
+            <button type="button" className="create-post-cancel" onClick={() => {
+              setIsReplying(false)
+              setReplyContent("")
+            }}>Annuler</button>
+          </div>
+        </form>
+      }
 
     </li>
   )

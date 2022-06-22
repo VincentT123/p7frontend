@@ -64,7 +64,6 @@ const Posts = () => {
       url: url,
       headers: { 'authorization': token },
       data: { id: user.uid }
-      //withCredentials: true
     })
       .then((res) => {
         setUserLikes(Array.from(res.data.results.filter(item => item.action === 1), item => item.post_id))
