@@ -12,7 +12,8 @@ const Posts = () => {
   const [content, setContent] = useState("")
   const [error, setError] = useState(false)
   const [image, setImage] = useState(null)
-  const hiddenImageInput = useRef(null);
+  const [imageFront, setImageFront] = useState(null)
+  const hiddenImageInput = useRef(null)
 
   const createPost = (e) => {
     e.preventDefault()
@@ -22,21 +23,37 @@ const Posts = () => {
       const url = `${process.env.REACT_APP_API_URL}groupomania/posts/createpost`
       const token = user.utoken
       const uname = user.uprenom + " " + user.unom
+
+      const obj = {
+        texte: content,
+        user_id: user.uid,
+        user_name: uname
+      }
+      const json = JSON.stringify(obj)
+      const formData = new FormData()
+      formData.append("image", image)
+      formData.append("message", json)
+
       axios({
         method: 'post',
         url: url,
-        headers: { 'authorization': token },
-        data: {
+        headers: {
+          'authorization': token,
+          "Content-Type": "multipart/form-data"
+        },
+        /*data: {
           texte: content,
           user_id: user.uid,
           user_name: uname
-        }
-        //withCredentials: true
+        }*/
+        data: formData
       })
         .then(() => {
           setIsCreating(false)
           setError(false)
           setContent("")
+          setImage(null)
+          setImageFront(null)
           getData()
         })
     }
@@ -80,11 +97,13 @@ const Posts = () => {
 
   const addImage = (e) => {
     console.log("target.file : ", e.target.files)
-    setImage(URL.createObjectURL(e.target.files[0]))
+    setImageFront(URL.createObjectURL(e.target.files[0]))
+    setImage(e.target.files[0])
   }
 
   const deleteImage = () => {
     setImage(null)
+    setImageFront(null)
   }
 
   useEffect(() => getData(), [])
@@ -99,14 +118,14 @@ const Posts = () => {
       <br />
       {isCreating &&
         <form action="" onSubmit={(e) => createPost(e)} id="form-create-post">
-          <img className="post-img-to-upload" src={image} />
+          <img className="post-img-to-upload" src={imageFront} />
           <div className="btn-upload-delete">
             <i onClick={(e) => handleImageClick(e)} className="far fa-image addimage"><span className="tooltip-addimage">Ajouter une image</span></i>
             <input type="file"
               style={{ display: 'none' }}
               ref={hiddenImageInput}
               onChange={(e) => addImage(e)} />
-            {image != null ? <i onClick={(e) => deleteImage(e)} className="far fa-trash-alt deleteimage"><span className="tooltip-deleteimage">Supprimer l'image</span></i> : <span></span>}
+            {imageFront != null ? <i onClick={(e) => deleteImage(e)} className="far fa-trash-alt deleteimage"><span className="tooltip-deleteimage">Supprimer l'image</span></i> : <span></span>}
           </div>
           <textarea
             spellCheck="false"

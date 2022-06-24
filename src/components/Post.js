@@ -226,6 +226,8 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
         <em>Posté le {dateFormat(post.date_cre)}</em>
       </div>
 
+      {post.url_media != null ? <img className="post-image" src={post.url_media} /> : <></>}
+
       {isEditing ? (
         <textarea
           spellCheck="false"

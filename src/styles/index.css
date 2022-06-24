@@ -398,6 +398,12 @@ nav {
   border: 1px solid #FFD7D7;
 }
 
+.post-image {
+  margin-top: 20px;
+  max-width: 100%;
+  height: auto;
+}
+
 .posts-page ul li textarea {
   margin-top: 20px;
   margin-bottom: 20px;
