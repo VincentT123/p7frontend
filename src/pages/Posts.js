@@ -41,11 +41,6 @@ const Posts = () => {
           'authorization': token,
           "Content-Type": "multipart/form-data"
         },
-        /*data: {
-          texte: content,
-          user_id: user.uid,
-          user_name: uname
-        }*/
         data: formData
       })
         .then(() => {
@@ -55,6 +50,7 @@ const Posts = () => {
           setImage(null)
           setImageFront(null)
           getData()
+          window.scrollTo(0, 0)
         })
     }
   }
@@ -99,6 +95,8 @@ const Posts = () => {
     console.log("target.file : ", e.target.files)
     setImageFront(URL.createObjectURL(e.target.files[0]))
     setImage(e.target.files[0])
+    console.log("imageFront url: ", URL.createObjectURL(e.target.files[0]))
+    console.log("imageFront : ", imageFront)
   }
 
   const deleteImage = () => {
@@ -118,7 +116,7 @@ const Posts = () => {
       <br />
       {isCreating &&
         <form action="" onSubmit={(e) => createPost(e)} id="form-create-post">
-          <img className="post-img-to-upload" src={imageFront} />
+          {(imageFront != null) ? <img className="post-img-to-upload" src={imageFront} /> : <></>}
           <div className="btn-upload-delete">
             <i onClick={(e) => handleImageClick(e)} className="far fa-image addimage"><span className="tooltip-addimage">Ajouter une image</span></i>
             <input type="file"

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { UserContext } from '../components/AppContext'
 import axios from 'axios'
 
@@ -17,6 +17,9 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
   const [isLiked, setIsLiked] = useState(userLikesC.includes(comment.id))
   const [isDisliked, setIsDisliked] = useState(userDislikesC.includes(comment.id))
   console.log("isLiked : ", isLiked)
+  const [image, setImage] = useState(null)
+  const [imageFront, setImageFront] = useState(null)
+  const hiddenImageInput = useRef(null)
 
   const likeComment = (act) => {
     if (comment.user_id === user.uid) {
@@ -87,19 +90,40 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
     const url = `${process.env.REACT_APP_API_URL}groupomania/comments/updatecomment`
     const token = user.utoken
     const commentId = comment.id
-    const text = editContent
+    const text = (editContent ? editContent : comment.texte)
+    const supprImg = (comment.url_media != null && imageFront === null)
+    const obj = {
+      id: commentId,
+      texte: text,
+      supprImg
+    }
+    const json = JSON.stringify(obj)
+    const formData = new FormData()
+    formData.append("image", image)
+    formData.append("message", json)
     axios({
       method: 'put',
       url: url,
-      headers: { 'authorization': token },
-      data: {
-        id: commentId,
-        texte: text
-      }
+      headers: {
+        'authorization': token,
+        "Content-Type": "multipart/form-data"
+      },
+      data: formData
     })
-      .then(() => {
+      .then((res) => {
         setIsEditing(false)
-        comment.texte = editContent
+        if (editContent != "") {
+          comment.texte = editContent
+          setEditContent("")
+        }
+        if (res.data.imageUrl != undefined) {
+          comment.url_media = res.data.imageUrl
+          setImageFront(comment.url_media)
+        }
+        if (supprImg) {
+          comment.url_media = null
+          setImageFront(null)
+        }
       })
   }
 
@@ -134,6 +158,23 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
     setIsReplying(true)
   }
 
+  const handleImageClick = (e) => {
+    hiddenImageInput.current.click()
+  }
+
+  const addImage = (e) => {
+    console.log("target.file : ", e.target.files)
+    setImageFront(URL.createObjectURL(e.target.files[0]))
+    setImage(e.target.files[0])
+    console.log("imageFront url: ", URL.createObjectURL(e.target.files[0]))
+    console.log("imageFront : ", imageFront)
+  }
+
+  const deleteImage = () => {
+    setImage(null)
+    setImageFront(null)
+  }
+
   const dateFormat = (date) => {
     let newDate = new Date(date).toLocaleDateString("fr-FR", {
       year: "numeric",
@@ -146,6 +187,10 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
     return newDate
   }
 
+  useEffect(() => {
+    setImageFront(comment.url_media)
+  }, [])
+
   return (
     <li className="comment" style={{ background: isEditing ? "#f3feff" : "white" }} id={comment.id}>
 
@@ -154,13 +199,25 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
         <em>Posté le {dateFormat(comment.date_cre)}</em>
       </div>
 
+      {(imageFront != null) ? <img className="comment-image" src={imageFront} /> : <></>}
+
       {isEditing ? (
-        <textarea
-          spellCheck="false"
-          value={editContent ? editContent : comment.texte}
-          autoFocus
-          onChange={(e) => setEditContent(e.target.value)}>
-        </textarea>
+        <>
+          <div className="btn-upload-delete">
+            <i onClick={(e) => handleImageClick(e)} className="far fa-image addimage"><span className="tooltip-addimage">Ajouter une image</span></i>
+            <input type="file"
+              style={{ display: 'none' }}
+              ref={hiddenImageInput}
+              onChange={(e) => addImage(e)} />
+            {imageFront != null ? <i onClick={(e) => deleteImage(e)} className="far fa-trash-alt deleteimage"><span className="tooltip-deleteimage">Supprimer l'image</span></i> : <span></span>}
+          </div>
+          <textarea
+            spellCheck="false"
+            value={editContent ? editContent : comment.texte}
+            autoFocus
+            onChange={(e) => setEditContent(e.target.value)}>
+          </textarea>
+        </>
       ) : (
         <p className="comment-content">{editContent ? editContent : comment.texte}</p>
       )}
