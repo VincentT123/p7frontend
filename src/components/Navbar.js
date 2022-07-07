@@ -5,9 +5,6 @@ import { UserContext } from '../components/AppContext'
 
 const Navbar = () => {
   const user = useContext(UserContext)
-  console.log("nav-id : ", user.uid)
-  console.log("nav-token : ", user.utoken)
-  console.log("nav-prenom : ", user.uprenom)
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -16,6 +13,7 @@ const Navbar = () => {
     user.setUserToken(null)
     user.setUserNom(null)
     user.setUserPrenom(null)
+    sessionStorage.clear()
     navigate("/")
   }
 

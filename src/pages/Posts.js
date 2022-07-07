@@ -23,7 +23,6 @@ const Posts = () => {
       const url = `${process.env.REACT_APP_API_URL}groupomania/posts/createpost`
       const token = user.utoken
       const uname = user.uprenom + " " + user.unom
-
       const obj = {
         texte: content,
         user_id: user.uid,
@@ -55,6 +54,14 @@ const Posts = () => {
     }
   }
 
+  const getStorage = () => {
+    const userStorageGet = JSON.parse(sessionStorage.getItem('user'))
+    user.setUserId(userStorageGet.userId)
+    user.setUserToken(userStorageGet.userToken)
+    user.setUserNom(userStorageGet.userNom)
+    user.setUserPrenom(userStorageGet.userPrenom)
+  }
+
   const getData = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/posts/listposts`
     const token = user.utoken
@@ -62,7 +69,6 @@ const Posts = () => {
       method: 'get',
       url: url,
       headers: { 'authorization': token }
-      //withCredentials: true
     })
       .then((res) => {
         setPostsData(res.data.results)
@@ -73,7 +79,6 @@ const Posts = () => {
   const getLikes = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/posts/userlikes`
     const token = user.utoken
-    console.log("id : ", user.uid)
     axios({
       method: 'post',
       url: url,
@@ -92,11 +97,8 @@ const Posts = () => {
   }
 
   const addImage = (e) => {
-    console.log("target.file : ", e.target.files)
     setImageFront(URL.createObjectURL(e.target.files[0]))
     setImage(e.target.files[0])
-    console.log("imageFront url: ", URL.createObjectURL(e.target.files[0]))
-    console.log("imageFront : ", imageFront)
   }
 
   const deleteImage = () => {
@@ -104,8 +106,11 @@ const Posts = () => {
     setImageFront(null)
   }
 
-  useEffect(() => getData(), [])
-  useEffect(() => getLikes(), [])
+  useEffect(() => {
+    getStorage()
+    getData()
+    getLikes()
+  }, [user])
 
   return (
     <div className="posts-page">
@@ -139,6 +144,7 @@ const Posts = () => {
               setIsCreating(false)
               setContent("")
               setImage(null)
+              setImageFront(null)
             }}>Annuler</button>
           </div>
         </form>

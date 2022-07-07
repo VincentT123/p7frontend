@@ -21,6 +21,11 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
   const [image, setImage] = useState(null)
   const [imageFront, setImageFront] = useState(null)
   const hiddenImageInput = useRef(null)
+  const [imageC, setImageC] = useState(null)
+  const [imageFrontC, setImageFrontC] = useState(null)
+  const hiddenImageInputC = useRef(null)
+  const addCommentRef = useRef(null)
+  let scroll = 0
 
   const likePost = (act) => {
     if (post.user_id === user.uid) {
@@ -88,14 +93,9 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
   }
 
   const getComments = (flag) => {
-    /*if (isComments && flag === 0) {
-      setIsComments(false)
-      return
-    }*/
     const url = `${process.env.REACT_APP_API_URL}groupomania/comments/listcomments`
     const token = user.utoken
     const postId = post.id
-    console.log("post_id : ", postId)
     axios({
       method: 'post',
       url: url,
@@ -106,7 +106,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
     })
       .then((res) => {
         setCommentsData(res.data.results)
-        //setIsComments(true)
+        scroll = scroll + 1
       })
       .catch((err) => console.log("erreur axios listcomments : ", err))
   }
@@ -205,6 +205,10 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       })
   }
 
+  const scrollToComment = () => {
+    addCommentRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
+  }
+
   const createComment = (e) => {
     e.preventDefault()
     if (replyContent.length > 2000) {
@@ -213,23 +217,35 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       const url = `${process.env.REACT_APP_API_URL}groupomania/comments/createcomment`
       const token = user.utoken
       const uname = user.uprenom + " " + user.unom
+      const obj = {
+        texte: replyContent,
+        post_id: post.id,
+        user_id: user.uid,
+        user_name: uname
+      }
+      const json = JSON.stringify(obj)
+      const formData = new FormData()
+      formData.append("image", imageC)
+      formData.append("message", json)
+
       axios({
         method: 'post',
         url: url,
-        headers: { 'authorization': token },
-        data: {
-          texte: replyContent,
-          post_id: post.id,
-          user_id: user.uid,
-          user_name: uname
-        }
+        headers: {
+          'authorization': token,
+          "Content-Type": "multipart/form-data"
+        },
+        data: formData
       })
         .then((res) => {
           setIsReplying(false)
           setErrorReply(false)
           setReplyContent("")
-          post.comments = post.comments + 1
+          setImageC(null)
+          setImageFrontC(null)
           getCommentsData(1)
+          post.comments = post.comments + 1
+
         })
     }
   }
@@ -239,16 +255,27 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
   }
 
   const addImage = (e) => {
-    console.log("target.file : ", e.target.files)
     setImageFront(URL.createObjectURL(e.target.files[0]))
     setImage(e.target.files[0])
-    console.log("imageFront url: ", URL.createObjectURL(e.target.files[0]))
-    console.log("imageFront : ", imageFront)
   }
 
   const deleteImage = () => {
     setImage(null)
     setImageFront(null)
+  }
+
+  const handleImageClickC = (e) => {
+    hiddenImageInputC.current.click()
+  }
+
+  const addImageC = (e) => {
+    setImageFrontC(URL.createObjectURL(e.target.files[0]))
+    setImageC(e.target.files[0])
+  }
+
+  const deleteImageC = () => {
+    setImageC(null)
+    setImageFrontC(null)
   }
 
   const dateFormat = (date) => {
@@ -267,8 +294,13 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
     setImageFront(post.url_media)
   }, [])
 
+  /*useEffect(() => {
+    addCommentRef.current.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
+  }, [scroll])*/
+
+
   return (
-    <li className="post" style={{ background: isEditing ? "#f3feff" : "white" }} id={post.id}>
+    <li ref={addCommentRef} className="post" style={{ background: isEditing ? "#f3feff" : "white" }} id={post.id}>
 
       <div className="post-header">
         <h3>{post.user_name}</h3>
@@ -339,6 +371,15 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
 
       {isReplying &&
         <form action="" onSubmit={(e) => createComment(e)} id="form-create-comment">
+          {(imageFrontC != null) ? <img className="post-img-to-upload" src={imageFrontC} /> : <></>}
+          <div className="btn-upload-delete">
+            <i onClick={(e) => handleImageClickC(e)} className="far fa-image addimage"><span className="tooltip-addimage">Ajouter une image</span></i>
+            <input type="file"
+              style={{ display: 'none' }}
+              ref={hiddenImageInputC}
+              onChange={(e) => addImageC(e)} />
+            {imageFrontC != null ? <i onClick={(e) => deleteImageC(e)} className="far fa-trash-alt deleteimage"><span className="tooltip-deleteimage">Supprimer l'image</span></i> : <span></span>}
+          </div>
           <textarea
             spellCheck="false"
             style={{ border: errorReply ? "1px solid red" : "1px solid #61dafb" }}
@@ -352,6 +393,8 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
             <button type="button" className="create-post-cancel" onClick={() => {
               setIsReplying(false)
               setReplyContent("")
+              setImageC(null)
+              setImageFrontC(null)
             }}>Annuler</button>
           </div>
         </form>

@@ -12,11 +12,8 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
   // temp : -> passer les likes/dislikes dans le contexte user
   //const [userLikes, setUserLikes] = useState([])
   //const [userDislikes, setUserDislikes] = useState([])
-  console.log("comment id : ", comment.id)
-  console.log("userLikesC : ", userLikesC)
   const [isLiked, setIsLiked] = useState(userLikesC.includes(comment.id))
   const [isDisliked, setIsDisliked] = useState(userDislikesC.includes(comment.id))
-  console.log("isLiked : ", isLiked)
   const [image, setImage] = useState(null)
   const [imageFront, setImageFront] = useState(null)
   const hiddenImageInput = useRef(null)
@@ -163,11 +160,8 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
   }
 
   const addImage = (e) => {
-    console.log("target.file : ", e.target.files)
     setImageFront(URL.createObjectURL(e.target.files[0]))
     setImage(e.target.files[0])
-    console.log("imageFront url: ", URL.createObjectURL(e.target.files[0]))
-    console.log("imageFront : ", imageFront)
   }
 
   const deleteImage = () => {

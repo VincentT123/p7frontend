@@ -15,13 +15,9 @@ const SignIn = () => {
     e.preventDefault()
     const emailError = document.querySelector('.email.error')
     const passwordError = document.querySelector('.password.error')
-    console.log("handleLogin")
     await axios({
       method: "post",
       url: `${process.env.REACT_APP_API_URL}groupomania/auth/login`,
-      //withCredentials: true,
-      //headers: {'X-Custom-Header': 'foobar'},
-      //headers: req.headers.set('Authorization', 'Bearer ' + authToken),
       headers: { 'Authorization': test },
       data: {
         email,
@@ -38,6 +34,13 @@ const SignIn = () => {
           user.setUserToken(res.data.token)
           user.setUserNom(res.data.nom)
           user.setUserPrenom(res.data.prenom)
+          const userStorageSet = {
+            userId: res.data.userId,
+            userToken: res.data.token,
+            userNom: res.data.nom,
+            userPrenom: res.data.prenom
+          }
+          sessionStorage.setItem('user', JSON.stringify(userStorageSet))
           navigate("/posts")
         }
       })
