@@ -12,7 +12,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
   const [errorReply, setErrorReply] = useState(false)
   const [isComments, setIsComments] = useState(false)
   const [commentsData, setCommentsData] = useState([])
-  const isAuthor = (post.user_id === user.uid)
+  const isAuthor = (post.user_id === user.uid || user.udroits === 1)
   const [isLiked, setIsLiked] = useState(userLikes.includes(post.id))
   const [isDisliked, setIsDisliked] = useState(userDislikes.includes(post.id))
   // likes à passer dans le contexte ?
@@ -336,7 +336,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
           {post.likes}&nbsp;&nbsp;<i onClick={() => likePost(1)} className={`${isLiked ? "fas liked " : "far "} fa-thumbs-up thumb-up`}></i> | &nbsp;&nbsp;
           {post.dislikes}&nbsp;&nbsp;<i onClick={() => likePost(-1)} className={`${isDisliked ? "fas disliked " : "far "} fa-thumbs-down thumb-down`}></i> | &nbsp;&nbsp;
           <button onClick={() => { getCommentsData(0) }}>{post.comments}&nbsp;&nbsp;Commentaires</button>
-          <span onClick={() => setIsReplying(true)} className="reply">Répondre</span>
+          <span onClick={() => { if (user.udroits === 0) setIsReplying(true) }} className="reply">Répondre</span>
         </div>
 
         <div className="post-maj-btn">

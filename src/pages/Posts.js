@@ -60,6 +60,7 @@ const Posts = () => {
     user.setUserToken(userStorageGet.userToken)
     user.setUserNom(userStorageGet.userNom)
     user.setUserPrenom(userStorageGet.userPrenom)
+    user.setUserDroits(userStorageGet.userDroits)
   }
 
   const getData = () => {
@@ -115,7 +116,7 @@ const Posts = () => {
   return (
     <div className="posts-page">
       <div className="posts-page-header">
-        <button type="button" onClick={() => setIsCreating(true)} className="btn-create-post">ECRIRE UN COMMENTAIRE</button>
+        <button type="button" onClick={() => { if (user.udroits === 0) setIsCreating(true) }} className="btn-create-post">ECRIRE UN COMMENTAIRE</button>
         <button type="button" onClick={() => { getData(); getLikes() }} className="btn-refresh">ACTUALISER</button>
       </div>
       <br />

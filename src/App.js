@@ -7,6 +7,7 @@ function App() {
   const [utoken, setUtoken] = useState(null)
   const [unom, setUnom] = useState(null)
   const [uprenom, setUprenom] = useState(null)
+  const [udroits, setUdroits] = useState(null)
   const setUserId = (id) => {
     setUid(id)
   }
@@ -19,9 +20,12 @@ function App() {
   const setUserPrenom = (prenom) => {
     setUprenom(prenom)
   }
+  const setUserDroits = (droits) => {
+    setUdroits(droits)
+  }
 
   return (
-    <UserContext.Provider value={{ uid, setUserId, utoken, setUserToken, unom, setUserNom, uprenom, setUserPrenom }}>
+    <UserContext.Provider value={{ uid, setUserId, utoken, setUserToken, unom, setUserNom, uprenom, setUserPrenom, udroits, setUserDroits }}>
       <Routes />
     </UserContext.Provider>
   )

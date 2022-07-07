@@ -6,7 +6,7 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
   const user = useContext(UserContext)
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState("")
-  const isAuthor = (comment.user_id === user.uid)
+  const isAuthor = (comment.user_id === user.uid || user.udroits === 1)
   //const [isLiked, setIsLiked] = useState(userLikes.includes(comment.id))
   //const [isDisliked, setIsDisliked] = useState(userDislikes.includes(comment.id))
   // temp : -> passer les likes/dislikes dans le contexte user
@@ -152,7 +152,7 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
   }
 
   const reply = () => {
-    setIsReplying(true)
+    if (user.udroits === 0) setIsReplying(true)
   }
 
   const handleImageClick = (e) => {

@@ -34,11 +34,13 @@ const SignIn = () => {
           user.setUserToken(res.data.token)
           user.setUserNom(res.data.nom)
           user.setUserPrenom(res.data.prenom)
+          user.setUserDroits(res.data.droits)
           const userStorageSet = {
             userId: res.data.userId,
             userToken: res.data.token,
             userNom: res.data.nom,
-            userPrenom: res.data.prenom
+            userPrenom: res.data.prenom,
+            userDroits: res.data.droits
           }
           sessionStorage.setItem('user', JSON.stringify(userStorageSet))
           navigate("/posts")
