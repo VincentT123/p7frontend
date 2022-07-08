@@ -185,8 +185,15 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
     setImageFront(comment.url_media)
   }, [])
 
+  useEffect(() => {
+    if (comment.id === commentsData[commentsData.length - 1].id) {
+      const scrollToComment = document.getElementById("comment" + comment.id)
+      scrollToComment.scrollIntoView(false)
+    }
+  }, [])
+
   return (
-    <li className="comment" style={{ background: isEditing ? "#f3feff" : "white" }} id={comment.id}>
+    <li className="comment" style={{ background: isEditing ? "#f3feff" : "white" }} id={"comment" + comment.id}>
 
       <div className="comment-header">
         <h3>{comment.user_name}</h3>

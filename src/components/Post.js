@@ -24,8 +24,6 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
   const [imageC, setImageC] = useState(null)
   const [imageFrontC, setImageFrontC] = useState(null)
   const hiddenImageInputC = useRef(null)
-  const addCommentRef = useRef(null)
-  let scroll = 0
 
   const likePost = (act) => {
     if (post.user_id === user.uid) {
@@ -106,7 +104,8 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
     })
       .then((res) => {
         setCommentsData(res.data.results)
-        scroll = scroll + 1
+        /*const scrollToComment = document.getElementById("ancre")
+        scrollToComment.scrollIntoView()*/
       })
       .catch((err) => console.log("erreur axios listcomments : ", err))
   }
@@ -205,10 +204,6 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       })
   }
 
-  const scrollToComment = () => {
-    addCommentRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
-  }
-
   const createComment = (e) => {
     e.preventDefault()
     if (replyContent.length > 2000) {
@@ -245,7 +240,8 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
           setImageFrontC(null)
           getCommentsData(1)
           post.comments = post.comments + 1
-
+          //const scrollToComment = document.getElementById("ancre")
+          //scrollToComment.scrollIntoView(false)
         })
     }
   }
@@ -294,13 +290,8 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
     setImageFront(post.url_media)
   }, [])
 
-  /*useEffect(() => {
-    addCommentRef.current.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
-  }, [scroll])*/
-
-
   return (
-    <li ref={addCommentRef} className="post" style={{ background: isEditing ? "#f3feff" : "white" }} id={post.id}>
+    <li className="post" style={{ background: isEditing ? "#f3feff" : "white" }} id={"post" + post.id}>
 
       <div className="post-header">
         <h3>{post.user_name}</h3>
