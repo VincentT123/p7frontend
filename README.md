@@ -8,3 +8,4 @@ Avant de lancer l'application, il faudra copier dans le dossier créé précéde
 
 Pour lancer l'application : avec la console de commande, dans le dossier créé précédemment, entrer 'npm start'.
 
+Note : le fichier .env de frontend contient les paramètres de port de l'application et de l'API.
