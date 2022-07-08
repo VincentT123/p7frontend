@@ -19,9 +19,22 @@ const SignUp = () => {
     const passwordError = document.querySelector('.password.error')
     const passwordConfirmError = document.querySelector('.password-confirm.error')
     const termsError = document.querySelector('.terms.error')
+    const ruleNom = /^[A-Za-z-' ]{1,30}$/
+    const rulePrenom = /^[A-Za-z- ]{1,30}$/
+    const ruleEmail = /^[a-z0-9._-]{2,30}[@][a-z0-9_-]{2,20}[.][a-z]{2,15}$/
+    const rulePass = /^[A-Za-z0-9-*+]{8,25}$/
 
+    nomError.innerHTML = ""
+    prenomError.innerHTML = ""
+    emailError.innerHTML = ""
+    passwordError.innerHTML = ""
     passwordConfirmError.innerHTML = ""
     termsError.innerHTML = ""
+
+    if (!ruleNom.test(nom)) { nomError.innerHTML = "1 à 30 caractères (lettres, tiret, apostrophe)"; return }
+    if (!rulePrenom.test(prenom)) { prenomError.innerHTML = "1 à 30 caractères (lettres, tiret)"; return }
+    if (!ruleEmail.test(email)) { emailError.innerHTML = "Veuillez entrer une adresse email valide"; return }
+    if (!rulePass.test(password)) { passwordError.innerHTML = "8 caractères minimum (lettres, chiffres, +, -, *)"; return }
 
     if (password !== controlPassword || !terms.checked) {
       if (password !== controlPassword) {

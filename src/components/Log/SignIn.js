@@ -15,6 +15,15 @@ const SignIn = () => {
     e.preventDefault()
     const emailError = document.querySelector('.email.error')
     const passwordError = document.querySelector('.password.error')
+    const ruleEmail = /^[a-z0-9._-]{2,30}[@][a-z0-9_-]{2,20}[.][a-z]{2,15}$/
+    const rulePass = /^[A-Za-z0-9-*+]{8,25}$/
+
+    emailError.innerHTML = ""
+    passwordError.innerHTML = ""
+
+    if (!ruleEmail.test(email)) { emailError.innerHTML = "Veuillez entrer une adresse email valide"; return }
+    if (!rulePass.test(password)) { passwordError.innerHTML = "8 caractères minimum (lettres, chiffres, +, -, *)"; return }
+
     await axios({
       method: "post",
       url: `${process.env.REACT_APP_API_URL}groupomania/auth/login`,
@@ -25,6 +34,7 @@ const SignIn = () => {
       },
     })
       .then((res) => {
+        console.log("login res : ", res)
         if (res.data.errors) {
           emailError.innerHTML = res.data.errors.email
           passwordError.innerHTML = res.data.errors.password
