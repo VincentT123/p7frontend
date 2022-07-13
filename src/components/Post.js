@@ -43,9 +43,11 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
 
   // fonction de traitement des likes :
   //   - un utilisateur ne peut pas voter pour lui-même
-  //   - un like est enregistré avec une 'action' à 1 dans la table 'posts_likes', -1 pour un disl1ke
+  //   - un like est enregistré avec une 'action' à 1 dans la table 'posts_likes', -1 pour un dislike
   //   - si l'utilisateur a déjà liké/disliké un post, le clic suivant sur l'incône correspondante annule
-  //     son like/dislike, et action est mis à 0 pour le traitement par l'API
+  //     son like/dislike, et 'action' est mis à 0 pour le traitement par l'API
+  //   - si l'utilisateur a déjà liké/disliké un post, le clic sur l'icône opposée annule son like/dislike,
+  //     et 'action' reste à 1 ou -1 pour le traitement par l'API
   const likePost = (act) => {
     if (post.user_id === user.uid) {
       alert("Vous ne pouvez pas voter pour votre propre commentaire")
@@ -211,7 +213,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
     setImageFront(post.url_media)
   }
 
-  // supprime un commentaire de la table 'posts' suite au clic sur le bouton 'Supprimer'
+  // supprime un post de la table 'posts' suite au clic sur le bouton 'Supprimer'
   const removePost = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/posts/deletepost`
     const token = user.utoken

@@ -4,20 +4,28 @@ import axios from 'axios'
 
 const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLikesC, userDislikesC, setUserDislikesC, isReplying, setIsReplying, postsData, setPostsData }) => {
   const user = useContext(UserContext)
+  // isEditing est un booléen permettant d'afficher ou pas le formulaire d'édition d'un commentaire
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState("")
+  // isAuthor : booléen qui détermine si l'utilisateur est l'auteur du commentaire (ou l'admin) pour la modif/suppression
   const isAuthor = (comment.user_id === user.uid || user.udroits === 1)
-  //const [isLiked, setIsLiked] = useState(userLikes.includes(comment.id))
-  //const [isDisliked, setIsDisliked] = useState(userDislikes.includes(comment.id))
-  // temp : -> passer les likes/dislikes dans le contexte user
-  //const [userLikes, setUserLikes] = useState([])
-  //const [userDislikes, setUserDislikes] = useState([])
+  // isLiked et isDisliked : booléen déterminant si le commentaire a été liké/disliké par l'utilisateur
   const [isLiked, setIsLiked] = useState(userLikesC.includes(comment.id))
   const [isDisliked, setIsDisliked] = useState(userDislikesC.includes(comment.id))
+  // image (base) et imageFront (affichage) mémorise l'image éventuellement jointe au post par l'utilisateur
+  // le useRef suivant permet d'utiliser un input de type file pour permettre à l'utilisateur de
+  // joindre une image à son post tout en occultant cet input et en transférant le traitement sur une icône à cliquer
   const [image, setImage] = useState(null)
   const [imageFront, setImageFront] = useState(null)
   const hiddenImageInput = useRef(null)
 
+  // fonction de traitement des likes :
+  //   - un utilisateur ne peut pas voter pour lui-même
+  //   - un like est enregistré avec une 'action' à 1 dans la table 'comments_likes', -1 pour un dislike
+  //   - si l'utilisateur a déjà liké/disliké un commentaire, le clic suivant sur l'incône correspondante
+  //     annule son like/dislike, et 'action' est mis à 0 pour le traitement par l'API
+  //   - si l'utilisateur a déjà liké/disliké un post, le clic sur l'icône opposée annule son like/dislike,
+  //     et 'action' reste à 1 ou -1 pour le traitement par l'API
   const likeComment = (act) => {
     if (comment.user_id === user.uid) {
       alert("Vous ne pouvez pas voter pour votre propre commentaire")
@@ -83,6 +91,8 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
       })
   }
 
+  // fonction gérant la mise à jour d'un post dans la base suite à un clic sur le bouton 'Valider'
+  // les données doivent être formatées sous un formData pour permettre le traitement des img par l'API
   const editComment = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/comments/updatecomment`
     const token = user.utoken
@@ -124,6 +134,7 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
       })
   }
 
+  // supprime un commentaire de la table 'comments' suite au clic sur le bouton 'Supprimer'
   const removeComment = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/comments/deletecomment`
     const token = user.utoken
@@ -151,24 +162,29 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
       })
   }
 
+  // permet d'afficher le formulaire de création de commentaire suite à un clic sur le bouton 'Répondre'
   const reply = () => {
     if (user.udroits === 0) setIsReplying(true)
   }
 
+  // évite l'affichage de l'input de type file et permet d'utiliser un bouton custom
   const handleImageClick = (e) => {
     hiddenImageInput.current.click()
   }
 
+  // mémorise l'éventuelle image jointe au post par l'utilisateur
   const addImage = (e) => {
     setImageFront(URL.createObjectURL(e.target.files[0]))
     setImage(e.target.files[0])
   }
 
+  // efface les données image mémorisées suite au clic sur l'icône 'supprimer l'image' d'un post
   const deleteImage = () => {
     setImage(null)
     setImageFront(null)
   }
 
+  // fonction convertissant le timestamp fourni par la base en date au format "jour mois année à hh:mm:ss"
   const dateFormat = (date) => {
     let newDate = new Date(date).toLocaleDateString("fr-FR", {
       year: "numeric",
@@ -181,10 +197,13 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
     return newDate
   }
 
+  // affiche l'image correspondante à l'adresse mémorisée dans la table 'post'
   useEffect(() => {
     setImageFront(comment.url_media)
   }, [])
 
+  // permet de déplacer l'affichage sur le dernier commentaire de la liste lors de l'apparition de
+  // cette liste ou à la création d'un nouveau commentaire
   useEffect(() => {
     if (comment.id === commentsData[commentsData.length - 1].id) {
       const scrollToComment = document.getElementById("comment" + comment.id)
