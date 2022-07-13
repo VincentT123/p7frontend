@@ -161,7 +161,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
     getLikesC()
   }
 
-  // fonction gérant la mise à jour d'un commentaire suite à un clic sur le bouton 'Valider'
+  // fonction gérant la mise à jour d'un post dans la base suite à un clic sur le bouton 'Valider'
   // les données doivent être formatées sous un formData pour permettre le traitement des img par l'API
   const editPost = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/posts/updatepost`
@@ -211,7 +211,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
     setImageFront(post.url_media)
   }
 
-  // supprime un commentaire de la table 'posts' suite au clic sur le bouton 'Valider'
+  // supprime un commentaire de la table 'posts' suite au clic sur le bouton 'Supprimer'
   const removePost = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/posts/deletepost`
     const token = user.utoken
@@ -230,9 +230,11 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       })
   }
 
+  // création d'un commentaire dans la table 'comments' suite à un clic sur le bouton 'Envoyer'
+  // les données doivent être formatées sous un formData pour permettre le traitement des img par l'API
   const createComment = (e) => {
     e.preventDefault()
-    if (replyContent.length > 2000) {
+    if (replyContent.length < 2 || replyContent.length > 2000) {
       setErrorReply(true)
     } else {
       const url = `${process.env.REACT_APP_API_URL}groupomania/comments/createcomment`

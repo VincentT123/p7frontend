@@ -22,8 +22,9 @@ const Posts = () => {
   const [imageFront, setImageFront] = useState(null)
   const hiddenImageInput = useRef(null)
 
+  // traitement du formulaire de création de post et requête de création sur la table 'posts' suite à
+  // un clic sur le bouton 'Envoyer'
   const createPost = (e) => {
-    // traitement du formulaire de création de post et requête de création sur la table 'posts'
     e.preventDefault()
     if (content.length < 2 || content.length > 2000) {
       setError(true)
