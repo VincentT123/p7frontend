@@ -7,9 +7,13 @@ import { UserContext } from '../components/AppContext'
 const Navbar = () => {
   const user = useContext(UserContext)
   const navigate = useNavigate()
+  // définition des constantes de seuil pour l'affichage des boutons texte ou des boutons symbole
+  // selon la taille de l'écran (grâce à la library react-media-hook)
   const largeScreen = useMediaPredicate("(min-width: 769px)")
   const smallScreen = useMediaPredicate("(max-width: 768px)")
 
+  // fonction permettant la deconnexion déclenchée au clic sur le bouton 'Logout'
+  // et affichage du formulaire d'inscription/connexion
   const handleLogout = () => {
     console.log("logout !")
     user.setUserId(null)

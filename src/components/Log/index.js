@@ -3,6 +3,8 @@ import SignIn from "./SignIn"
 import SignUp from "./SignUp"
 
 const Log = (props) => {
+
+  // selon la valeur modale le formulaire affiché sera soit celui du signUp, soit celui du signIn
   const [signUpModal, setSignUpModal] = useState(props.signup)
   const [signInModal, setSignInModal] = useState(props.signin)
 

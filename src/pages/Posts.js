@@ -5,21 +5,30 @@ import Post from '../components/Post'
 
 const Posts = () => {
   const user = useContext(UserContext)
+  // postsData mémorise la liste des posts obtenue avec la requête sur la table 'posts' de la base MySQL
   const [postsData, setPostsData] = useState([])
+  // userLikes et userDislikes mémorisent tous les likes et les dislikes de l'utilisateur obtenus avec
+  // la requête sur la table 'posts_likes'
   const [userLikes, setUserLikes] = useState([])
   const [userDislikes, setUserDislikes] = useState([])
+  // isCreating est un booléen permet d'afficher ou pas le formulaire de création de post
   const [isCreating, setIsCreating] = useState(false)
   const [content, setContent] = useState("")
   const [error, setError] = useState(false)
+  // image (base) et imageFront (affichage) mémorise l'image éventuellement jointe au post par l'utilisateur
+  // le useRef suivant permet d'utiliser un input de type file pour permettre à l'utilisateur de
+  // joindre une image à son post tout en occultant cet input et en transférant le traitement sur une icône à cliquer
   const [image, setImage] = useState(null)
   const [imageFront, setImageFront] = useState(null)
   const hiddenImageInput = useRef(null)
 
   const createPost = (e) => {
+    // traitement du formulaire de création de post et requête de création sur la table 'posts'
     e.preventDefault()
-    if (content.length > 2000) {
+    if (content.length < 2 || content.length > 2000) {
       setError(true)
     } else {
+      // la requête de création de post se fait à l'adresse paramétrée dans le fichier .env
       const url = `${process.env.REACT_APP_API_URL}groupomania/posts/createpost`
       const token = user.utoken
       const uname = user.uprenom + " " + user.unom
@@ -28,6 +37,8 @@ const Posts = () => {
         user_id: user.uid,
         user_name: uname
       }
+      // les données de la requête doivent être formatées dans un formData pour permettre le traitement
+      // des images par l'API
       const json = JSON.stringify(obj)
       const formData = new FormData()
       formData.append("image", image)
@@ -54,6 +65,8 @@ const Posts = () => {
     }
   }
 
+  // fonction permettant de récupérer les données utilisateur de la session et de la transmettre
+  // grâce au useContext à tous les composants les nécessitant
   const getStorage = () => {
     const userStorageGet = JSON.parse(sessionStorage.getItem('user'))
     user.setUserId(userStorageGet.userId)
@@ -63,6 +76,7 @@ const Posts = () => {
     user.setUserDroits(userStorageGet.userDroits)
   }
 
+  // fonction permettant d'établir la liste des posts à afficher
   const getData = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/posts/listposts`
     const token = user.utoken
@@ -77,6 +91,7 @@ const Posts = () => {
       .catch((err) => console.log("erreur axios listposts : ", err))
   }
 
+  // fonction récupérant tous les likes/dislikes de l'utilisateur
   const getLikes = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/posts/userlikes`
     const token = user.utoken
@@ -93,20 +108,25 @@ const Posts = () => {
       .catch((err) => console.log("erreur axios userlikes : ", err))
   }
 
+  // pour éviter l'affichage de l'input basique de type file et d'utiliser un bouton custom à la place
   const handleImageClick = (e) => {
     hiddenImageInput.current.click()
   }
 
+  // mémorise l'éventuelle image jointe au post par l'utilisateur 
   const addImage = (e) => {
     setImageFront(URL.createObjectURL(e.target.files[0]))
     setImage(e.target.files[0])
   }
 
+  // efface les données image mémorisées suite au clic sur l'icône 'supprimer l'image'
   const deleteImage = () => {
     setImage(null)
     setImageFront(null)
   }
 
+  // réception des données utilisateur, lecture de la base pour établir la liste des posts
+  // et tous les likes/dislikes de l'utilisateur sur les posts
   useEffect(() => {
     getStorage()
     getData()
@@ -138,7 +158,7 @@ const Posts = () => {
             onChange={(e) => setContent(e.target.value)}
             value={content}>
           </textarea>
-          {error && <p>Veuillez ne pas dépasser 2000 caractères</p>}
+          {error && <p>Veuillez saisir entre 2 et 2000 caractères</p>}
           <div className="create-post-footer">
             <input type="submit" value="Envoyer" className="create-post-submit" />
             <button type="button" className="create-post-cancel" onClick={() => {

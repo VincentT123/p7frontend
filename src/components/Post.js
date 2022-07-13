@@ -6,27 +6,46 @@ import Comment from '../components/Comment'
 
 const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDislikes, setUserDislikes }) => {
   const user = useContext(UserContext)
+  // isEditing est un booléen permettant d'afficher ou pas le formulaire d'édition d'un post
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState("")
+  // isReplying : booléen permettant d'afficher ou non le formulaire de création d'un commentaire
   const [isReplying, setIsReplying] = useState(false)
   const [replyContent, setReplyContent] = useState("")
   const [errorReply, setErrorReply] = useState(false)
+  // isComments : booléen qui conditionne l'affichage de la liste des commentaires de réponse à un post 
   const [isComments, setIsComments] = useState(false)
+  // commentsData mémorise la liste des commentaires obtenue avec la requête sur la table 'comments' de la base MySQL
   const [commentsData, setCommentsData] = useState([])
+  // isAuthor : booléen qui détermine si l'utilisateur est l'auteur du post (ou l'admin) pour la modif/suppression
   const isAuthor = (post.user_id === user.uid || user.udroits === 1)
+  // isLiked et isDisliked : booléen déterminant si le post a été liké/disliké par l'utilisateur
   const [isLiked, setIsLiked] = useState(userLikes.includes(post.id))
   const [isDisliked, setIsDisliked] = useState(userDislikes.includes(post.id))
+  // userLikesC et userDislikesC mémorisent tous les likes et les dislikes de l'utilisateur obtenus avec
+  // la requête sur la table 'comments_likes'
   const [userLikesC, setUserLikesC] = useState([])
   const [userDislikesC, setUserDislikesC] = useState([])
+  // image (base) et imageFront (affichage) mémorise l'image éventuellement jointe au post par l'utilisateur
+  // le useRef suivant permet d'utiliser un input de type file pour permettre à l'utilisateur de
+  // joindre une image à son post tout en occultant cet input et en transférant le traitement sur une icône à cliquer
   const [image, setImage] = useState(null)
   const [imageFront, setImageFront] = useState(null)
   const hiddenImageInput = useRef(null)
+  // même solution que ci-dessus, pour les commentaires cette fois
   const [imageC, setImageC] = useState(null)
   const [imageFrontC, setImageFrontC] = useState(null)
   const hiddenImageInputC = useRef(null)
+  // définition des constantes de seuil pour l'affichage des boutons texte ou des boutons symbole
+  // selon la taille de l'écran (grâce à la library react-media-hook)
   const largeScreen = useMediaPredicate("(min-width: 769px)")
   const smallScreen = useMediaPredicate("(max-width: 768px)")
 
+  // fonction de traitement des likes :
+  //   - un utilisateur ne peut pas voter pour lui-même
+  //   - un like est enregistré avec une 'action' à 1 dans la table 'posts_likes', -1 pour un disl1ke
+  //   - si l'utilisateur a déjà liké/disliké un post, le clic suivant sur l'incône correspondante annule
+  //     son like/dislike, et action est mis à 0 pour le traitement par l'API
   const likePost = (act) => {
     if (post.user_id === user.uid) {
       alert("Vous ne pouvez pas voter pour votre propre commentaire")
@@ -92,7 +111,8 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       })
   }
 
-  const getComments = (flag) => {
+  // fonction permettant d'établir la liste des commentaires à afficher en réponse à un post
+  const getComments = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/comments/listcomments`
     const token = user.utoken
     const postId = post.id
@@ -106,14 +126,13 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
     })
       .then((res) => {
         setCommentsData(res.data.results)
-        /*const scrollToComment = document.getElementById("ancre")
-        scrollToComment.scrollIntoView()*/
       })
       .catch((err) => console.log("erreur axios listcomments : ", err))
   }
 
+  // fonction récupérant tous les likes/dislikes de l'utilisateur sur la liste des commentaires affichée
   const getLikesC = () => {
-    // conditionner l'accès db avec isComments
+    // conditionner l'accès db avec isComments ?
     const url = `${process.env.REACT_APP_API_URL}groupomania/comments/userlikes`
     const token = user.utoken
     axios({
@@ -130,8 +149,9 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       .catch((err) => console.log("erreur axios userlikes comments : ", err))
   }
 
-  /*useEffect(() => getComments(), [])
-  useEffect(() => getLikesC(), [])*/
+  // lecture de la table 'comments' pour établir la liste des commentaires du post concerné ainsi que
+  // tous les likes/dislikes de l'utilisateur sur ces commentaires
+  // flag permet d'alterner l'affichage de la liste sur un clic et la disparition sur le clic suivant 
   const getCommentsData = (flag) => {
     if (isComments && flag === 0) {
       setIsComments(false)
@@ -141,6 +161,8 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
     getLikesC()
   }
 
+  // fonction gérant la mise à jour d'un commentaire suite à un clic sur le bouton 'Valider'
+  // les données doivent être formatées sous un formData pour permettre le traitement des img par l'API
   const editPost = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/posts/updatepost`
     const token = user.utoken
@@ -182,12 +204,14 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       })
   }
 
+  // annule l'édition d'un post suite au clic sur le bouton 'Annuler'
   const cancelEdit = () => {
     setEditContent("")
     setIsEditing(false)
     setImageFront(post.url_media)
   }
 
+  // supprime un commentaire de la table 'posts' suite au clic sur le bouton 'Valider'
   const removePost = () => {
     const url = `${process.env.REACT_APP_API_URL}groupomania/posts/deletepost`
     const token = user.utoken
@@ -242,40 +266,45 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
           setImageFrontC(null)
           getCommentsData(1)
           post.comments = post.comments + 1
-          //const scrollToComment = document.getElementById("ancre")
-          //scrollToComment.scrollIntoView(false)
         })
     }
   }
 
+  // évite l'affichage de l'input de type file et permet d'utiliser un bouton custom (post)
   const handleImageClick = (e) => {
     hiddenImageInput.current.click()
   }
 
+  // mémorise l'éventuelle image jointe au post par l'utilisateur
   const addImage = (e) => {
     setImageFront(URL.createObjectURL(e.target.files[0]))
     setImage(e.target.files[0])
   }
 
+  // efface les données image mémorisées suite au clic sur l'icône 'supprimer l'image' d'un post
   const deleteImage = () => {
     setImage(null)
     setImageFront(null)
   }
 
+  // évite l'affichage de l'input de type file et permet d'utiliser un bouton custom (commentaire)
   const handleImageClickC = (e) => {
     hiddenImageInputC.current.click()
   }
 
+  // mémorise l'éventuelle image jointe au commentaire par l'utilisateur
   const addImageC = (e) => {
     setImageFrontC(URL.createObjectURL(e.target.files[0]))
     setImageC(e.target.files[0])
   }
 
+  // efface les données image mémorisées suite au clic sur l'icône 'supprimer l'image' d'un commentaire
   const deleteImageC = () => {
     setImageC(null)
     setImageFrontC(null)
   }
 
+  // fonction convertissant le timestamp fourni par la base en date au format "jour mois année à hh:mm:ss"
   const dateFormat = (date) => {
     let newDate = new Date(date).toLocaleDateString("fr-FR", {
       year: "numeric",
@@ -288,6 +317,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
     return newDate
   }
 
+  // affiche l'image correspondante à l'adresse mémorisée dans la table 'post'
   useEffect(() => {
     setImageFront(post.url_media)
   }, [])

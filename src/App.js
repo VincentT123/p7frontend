@@ -3,11 +3,15 @@ import { UserContext } from "./components/AppContext"
 import Routes from "./components/Routes"
 
 function App() {
+
+  // données sauvegardées dans le useContext
   const [uid, setUid] = useState(null)
   const [utoken, setUtoken] = useState(null)
   const [unom, setUnom] = useState(null)
   const [uprenom, setUprenom] = useState(null)
   const [udroits, setUdroits] = useState(null)
+
+  // fonctions de modifications des state transmis dans le useContext
   const setUserId = (id) => {
     setUid(id)
   }

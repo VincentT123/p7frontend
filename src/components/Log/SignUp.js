@@ -19,6 +19,7 @@ const SignUp = () => {
     const passwordError = document.querySelector('.password.error')
     const passwordConfirmError = document.querySelector('.password-confirm.error')
     const termsError = document.querySelector('.terms.error')
+    // règles permettant de valider la saisie dans le formulaire d'inscription
     const ruleNom = /^[A-Za-z-' ]{1,30}$/
     const rulePrenom = /^[A-Za-z- ]{1,30}$/
     const ruleEmail = /^[a-z0-9._-]{2,30}[@][a-z0-9_-]{2,20}[.][a-z]{2,15}$/
@@ -31,6 +32,7 @@ const SignUp = () => {
     passwordConfirmError.innerHTML = ""
     termsError.innerHTML = ""
 
+    // si les règles définies dans les constantes rule*** ne sont pas respectées alors affichage erreur
     if (!ruleNom.test(nom)) { nomError.innerHTML = "1 à 30 caractères (lettres, tiret, apostrophe)"; return }
     if (!rulePrenom.test(prenom)) { prenomError.innerHTML = "1 à 30 caractères (lettres, tiret)"; return }
     if (!ruleEmail.test(email)) { emailError.innerHTML = "Veuillez entrer une adresse email valide"; return }
@@ -44,6 +46,7 @@ const SignUp = () => {
         termsError.innerHTML = "Veuillez valider les conditions générales"
       }
     } else {
+      // requête vers la base MySQL permettant de valider l'inscription
       await axios({
         method: "post",
         url: `${process.env.REACT_APP_API_URL}groupomania/auth/signup`,
@@ -56,31 +59,18 @@ const SignUp = () => {
       })
         .then((res) => {
           if (res.data.errors) {
+            // inscription invalide : affichage du message d'erreur
             nomError.innerHTML = res.data.errors.nom
             prenomError.innerHTML = res.data.errors.prenom
             emailError.innerHTML = res.data.errors.email
             passwordError.innerHTML = res.data.errors.password
           } else {
+            // connexion valide : message inscription réussie et affichage du formulaire de connexion
             setFormSubmit(true)
           }
         })
-        .catch((error) => {
-          if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            console.log("data : ", error.response.data);
-            console.log("status : ", error.response.status);
-            console.log("headers : ", error.response.headers);
-          } else if (error.request) {
-            // The request was made but no response was received
-            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-            // http.ClientRequest in node.js
-            console.log("request : ", error.request);
-          } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log('Error : ', error.message);
-          }
-          console.log("config : ", error.config);
+        .catch((err) => {
+          console.log("err axios signUp-Form : ", err)
         })
     }
   }
