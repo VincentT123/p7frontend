@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { useMediaPredicate } from "react-media-hook";
 import { useNavigate } from 'react-router-dom'
 import { useContext } from 'react'
 import { UserContext } from '../components/AppContext'
@@ -6,6 +7,8 @@ import { UserContext } from '../components/AppContext'
 const Navbar = () => {
   const user = useContext(UserContext)
   const navigate = useNavigate()
+  const largeScreen = useMediaPredicate("(min-width: 769px)")
+  const smallScreen = useMediaPredicate("(max-width: 768px)")
 
   const handleLogout = () => {
     console.log("logout !")
@@ -25,12 +28,16 @@ const Navbar = () => {
         </div>
         {user.uid ? (
           <div className="nav-right">
-            <div>Bienvenue&nbsp;&nbsp;{user.uprenom}&nbsp;&nbsp;{user.unom}&nbsp;&nbsp;</div>
-            <button type="button" onClick={handleLogout}>Logout</button>
+            <div className="user-bloc">
+              <i className="fas fa-user-circle avatar"></i>
+              <span className="user-name">{user.uprenom}&nbsp;&nbsp;{user.unom}</span>
+            </div>
+            {largeScreen && <button type="button" onClick={handleLogout}>Logout</button>}
+            {smallScreen && <i onClick={handleLogout} className="fas fa-sign-out-alt btn-logout"></i>}
           </div>
         ) : (
           <div className="nav-right">
-            test
+            Réseau social
           </div>
         )}
       </div>

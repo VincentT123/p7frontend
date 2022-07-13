@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react"
+import { useMediaPredicate } from "react-media-hook"
 import { UserContext } from '../components/AppContext'
 import axios from 'axios'
 import Comment from '../components/Comment'
@@ -15,7 +16,6 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
   const isAuthor = (post.user_id === user.uid || user.udroits === 1)
   const [isLiked, setIsLiked] = useState(userLikes.includes(post.id))
   const [isDisliked, setIsDisliked] = useState(userDislikes.includes(post.id))
-  // likes à passer dans le contexte ?
   const [userLikesC, setUserLikesC] = useState([])
   const [userDislikesC, setUserDislikesC] = useState([])
   const [image, setImage] = useState(null)
@@ -24,6 +24,8 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
   const [imageC, setImageC] = useState(null)
   const [imageFrontC, setImageFrontC] = useState(null)
   const hiddenImageInputC = useRef(null)
+  const largeScreen = useMediaPredicate("(min-width: 769px)")
+  const smallScreen = useMediaPredicate("(max-width: 768px)")
 
   const likePost = (act) => {
     if (post.user_id === user.uid) {
@@ -333,14 +335,28 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
         <div className="post-maj-btn">
           {(isAuthor && isEditing) ? (
             <>
-              <button onClick={() => editPost()}>Valider</button>
-              <button onClick={() => cancelEdit()}>Annuler</button>
+              {largeScreen &&
+                <>
+                  <button onClick={() => editPost()}>Valider</button>
+                  <button onClick={() => cancelEdit()}>Annuler</button>
+                </>}
+              {smallScreen &&
+                <>
+                  <i onClick={() => editPost()} class="far fa-check-circle btn-small-screen"></i>
+                  <i onClick={() => cancelEdit()} class="far fa-window-close btn-small-screen"></i>
+                </>}
             </>
           ) : (isAuthor &&
-            <button onClick={() => setIsEditing(true)}>Editer</button>
+            <>
+              {largeScreen && <button onClick={() => setIsEditing(true)}>Editer</button>}
+              {smallScreen && <i onClick={() => setIsEditing(true)} className="far fa-edit btn-small-screen"></i>}
+            </>
           )}
           {isAuthor &&
-            <button onClick={() => removePost()}>Supprimer</button>
+            <>
+              {largeScreen && <button onClick={() => removePost()} className="btn-remove-txt">Supprimer</button>}
+              {smallScreen && <i onClick={() => removePost()} className="far fa-trash-alt btn-small-screen"></i>}
+            </>
           }
         </div>
 
