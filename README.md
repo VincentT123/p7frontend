@@ -2,10 +2,12 @@
 
 p7frontend est l'application front du projet 7 - Groupomania, développé avec React
 
-Pour installer cette application : télécharger le fichier zip ou cloner le repository, utiliser une console de commande pour aller dans le dossier créé (.../projet7/frontend) et entrer 'npm install' pour installer tous les modules nécessaires.
+Pour utiliser cette application, les outils suivants doivent être installés :
+- GIT, téléchargeable à cette adresse : https://git-scm.com/downloads
+- node.js, téléchargeable à cette adresse : https://nodejs.org/en/download/
 
-Avant de lancer l'application, il faudra copier dans le dossier créé précédemment le fichier env. adéquat contenant les paramètres confidentiels.
+Ensuite, télécharger le fichier zip ou cloner le repository, utiliser une console de commande pour aller dans le dossier créé (.../p7frontend) et entrer 'npm install' pour installer tous les modules nécessaires.
 
-Pour lancer l'application : avec la console de commande, dans le dossier créé précédemment, entrer 'npm start'.
+Avant de lancer p7frontend, il faudra copier dans le dossier créé précédemment le fichier env. adéquat contenant les paramètres de port de l'application et de l'API p7backend, et lancer l'API.
 
-Note : le fichier .env de frontend contient les paramètres de port de l'application et de l'API.
+Pour exécuter p7frontend : avec la console de commande, dans le dossier créé précédemment, entrer 'npm start'.
