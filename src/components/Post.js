@@ -48,9 +48,13 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
   //     son like/dislike, et 'action' est mis à 0 pour le traitement par l'API
   //   - si l'utilisateur a déjà liké/disliké un post, le clic sur l'icône opposée annule son like/dislike,
   //     et 'action' reste à 1 ou -1 pour le traitement par l'API
+  //   - le modérateur/admin ne peut pas liker
   const likePost = (act) => {
     if (post.user_id === user.uid) {
       alert("Vous ne pouvez pas voter pour votre propre commentaire")
+      return
+    }
+    if (user.udroits != 0) {
       return
     }
     let action = act
