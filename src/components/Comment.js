@@ -26,9 +26,13 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
   //     annule son like/dislike, et 'action' est mis à 0 pour le traitement par l'API
   //   - si l'utilisateur a déjà liké/disliké un post, le clic sur l'icône opposée annule son like/dislike,
   //     et 'action' reste à 1 ou -1 pour le traitement par l'API
+  //   - l'admin/modérateur ne peut pas liker les comments
   const likeComment = (act) => {
     if (comment.user_id === user.uid) {
       alert("Vous ne pouvez pas voter pour votre propre commentaire")
+      return
+    }
+    if (user.udroits != 0) {
       return
     }
     let action = act
