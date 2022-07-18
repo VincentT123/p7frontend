@@ -223,7 +223,7 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
         <em>Posté le {dateFormat(comment.date_cre)}</em>
       </div>
 
-      {(imageFront != null) ? <img className="comment-image" src={imageFront} /> : <></>}
+      {(imageFront != null) ? <img className="comment-image" src={imageFront} alt="of comment" /> : <></>}
 
       {isEditing ? (
         <>

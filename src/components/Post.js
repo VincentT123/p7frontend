@@ -338,7 +338,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
         <em>Posté le {dateFormat(post.date_cre)}</em>
       </div>
 
-      {(imageFront != null) ? <img className="post-image" src={imageFront} /> : <></>}
+      {(imageFront != null) ? <img className="post-image" src={imageFront} alt="of post" /> : <></>}
 
       {isEditing ? (
         <>
@@ -416,7 +416,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
 
       {isReplying &&
         <form action="" onSubmit={(e) => createComment(e)} id="form-create-comment">
-          {(imageFrontC != null) ? <img className="post-img-to-upload" src={imageFrontC} /> : <></>}
+          {(imageFrontC != null) ? <img className="post-img-to-upload" src={imageFrontC} alt="to upload" /> : <></>}
           <div className="btn-upload-delete">
             <i onClick={(e) => handleImageClickC(e)} className="far fa-image addimage"><span className="tooltip-addimage">Ajouter une image</span></i>
             <input type="file"

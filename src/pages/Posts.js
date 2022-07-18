@@ -2,6 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { UserContext } from '../components/AppContext'
 import axios from 'axios'
 import Post from '../components/Post'
+import ScrollToTop from '../components/ScrollToTop'
 
 const Posts = () => {
   const user = useContext(UserContext)
@@ -136,6 +137,7 @@ const Posts = () => {
 
   return (
     <div className="posts-page">
+      <ScrollToTop />
       <div className="posts-page-header">
         <button type="button" onClick={() => { if (user.udroits === 0) setIsCreating(true) }} className="btn-create-post">ECRIRE UN COMMENTAIRE</button>
         <button type="button" onClick={() => { getData(); getLikes() }} className="btn-refresh">ACTUALISER</button>
@@ -143,7 +145,7 @@ const Posts = () => {
       <br />
       {isCreating &&
         <form action="" onSubmit={(e) => createPost(e)} id="form-create-post">
-          {(imageFront != null) ? <img className="post-img-to-upload" src={imageFront} /> : <></>}
+          {(imageFront != null) ? <img className="post-img-to-upload" src={imageFront} alt="to upload" /> : <></>}
           <div className="btn-upload-delete">
             <i onClick={(e) => handleImageClick(e)} className="far fa-image addimage"><span className="tooltip-addimage">Ajouter une image</span></i>
             <input type="file"

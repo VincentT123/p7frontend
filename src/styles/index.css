@@ -113,8 +113,6 @@ nav {
   font-size: 24px;
 }
 
-.user-name {}
-
 .btn-logout {
   color: #FD2D01;
   cursor: pointer;
@@ -561,8 +559,43 @@ nav {
   height: auto;
 }
 
-/* logout    : <i class="fad fa-sign-out-alt"></i> */
-/* valider   : <i class="fad fa-check-circle"></i> */
-/* annuler   : <i class="fad fa-window-close"></i> */
-/* éditer    : <i class="fad fa-edit"></i> */
-/* supprimer : <i class="fad fa-trash-alt"></i> */
+/*---------------*/
+/* Scroll To Top */
+/*---------------*/
+
+.top-to-btm {
+  position: relative;
+}
+
+.icon-position {
+  position: fixed;
+  bottom: 40px;
+  right: 25px;
+  z-index: 20;
+}
+
+.icon-style {
+  background-color: #FD2D01;
+  border-radius: 3px;
+  height: 40px;
+  width: 40px;
+  color: #FFD7D7;
+  cursor: pointer;
+  animation: appear 0.5s ease;
+}
+
+.icon-style:hover {
+  animation: none;
+  background: #FFD7D7;
+  color: #FD2D01;
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
