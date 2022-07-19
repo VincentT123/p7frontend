@@ -1,6 +1,6 @@
 # p7frontend - projet 7 - Groupomania - OC dev web
 
-p7frontend est l'application front du projet 7 - Groupomania, développé avec React. Cette application necessite le lancement préalable de l'API p7backend.
+p7frontend est l'application front du projet 7 - Groupomania, développée avec React. Cette application nécessite le lancement préalable de l'API p7backend.
 
 Pour utiliser cette application, les outils suivants doivent être installés :
 - GIT, téléchargeable à cette adresse : https://git-scm.com/downloads
@@ -12,4 +12,4 @@ Avant de lancer p7frontend, il faudra copier, dans le dossier créé précédemm
 
 Enfin, pour exécuter p7frontend : avec la console de commande, dans le dossier créé précédemment, entrer 'npm start'.
 
-Note : il se peut qu'une "erreur" liée au module ESlint de React s'affiche dans un onglet supplémentaire du navigateur. Il s'agit en fait de l'affichage d'un warning dans un pop-up du navigateur au lieu de l'affichage normal dans la console, et uniquement en environnement de développement pas en production. En attendant une correction de ce bug par les personnes s'occupant des interactions React/ESlint, il suffit de fermer ce pop-up, qui n'empêche nullement l'application de s'exécuter. Dans le pire des cas, merci de vérifier que vous avez bien la dernière version de node.js installée, et d'entrer à nouveau 'npm start'.
+Note : certaines consoles de commandes tiennent compte des majuscules saisies, d'autres non. Ainsi, lorsque vous naviguez avec GIT bash, veillez à saisir les noms de dossiers correctement, par exemple pour une installation dans le dossier "Documents" de windows : "cd Documents" et non "cd documents". Sinon, un pop-up de warning lié au module Eslint de React peut apparaître au lancement de l'application dans la fenêtre du navigateur...
