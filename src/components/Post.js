@@ -54,6 +54,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
       alert("Vous ne pouvez pas voter pour votre propre commentaire")
       return
     }
+    // test sur user.droits pour interdire les like/dislike pour l'admin
     if (user.udroits != 0) {
       return
     }
@@ -138,7 +139,6 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
 
   // fonction récupérant tous les likes/dislikes de l'utilisateur sur la liste des commentaires affichée
   const getLikesC = () => {
-    // conditionner l'accès db avec isComments ?
     const url = `${process.env.REACT_APP_API_URL}groupomania/comments/userlikes`
     const token = user.utoken
     axios({
@@ -367,6 +367,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
           {post.likes}&nbsp;&nbsp;<i onClick={() => likePost(1)} className={`${isLiked ? "fas liked " : "far "} fa-thumbs-up thumb-up`}></i> | &nbsp;&nbsp;
           {post.dislikes}&nbsp;&nbsp;<i onClick={() => likePost(-1)} className={`${isDisliked ? "fas disliked " : "far "} fa-thumbs-down thumb-down`}></i> | &nbsp;&nbsp;
           <button onClick={() => { getCommentsData(0) }}>{post.comments}&nbsp;&nbsp;Commentaires</button>
+          {/* test sur user.droits pour interdire la création de comments pour l'admin*/}
           <span onClick={() => { if (user.udroits === 0) setIsReplying(true) }} className="reply">Répondre</span>
         </div>
 
@@ -432,7 +433,7 @@ const Post = ({ post, postsData, setPostsData, userLikes, setUserLikes, userDisl
             onChange={(e) => setReplyContent(e.target.value)}
             value={replyContent}>
           </textarea>
-          {errorReply && <p>Veuillez ne pas dépasser 2000 caractères</p>}
+          {errorReply && <p>Veuillez saisir entre 2 et 2000 caractères</p>}
           <div className="create-post-footer">
             <input type="submit" value="Envoyer" className="create-post-submit" />
             <button type="button" className="create-post-cancel" onClick={() => {

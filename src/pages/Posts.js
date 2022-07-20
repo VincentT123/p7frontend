@@ -139,6 +139,7 @@ const Posts = () => {
     <div className="posts-page">
       <ScrollToTop />
       <div className="posts-page-header">
+        {/* test sur user.droits pour interdire la création de posts pour l'admin*/}
         <button type="button" onClick={() => { if (user.udroits === 0) setIsCreating(true) }} className="btn-create-post">ECRIRE UN COMMENTAIRE</button>
         <button type="button" onClick={() => { getData(); getLikes() }} className="btn-refresh">ACTUALISER</button>
       </div>

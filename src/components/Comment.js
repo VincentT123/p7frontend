@@ -32,6 +32,7 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
       alert("Vous ne pouvez pas voter pour votre propre commentaire")
       return
     }
+    // test sur user.droits pour interdire les like/dislike pour l'admin
     if (user.udroits != 0) {
       return
     }
@@ -167,6 +168,7 @@ const Comment = ({ comment, commentsData, setCommentsData, userLikesC, setUserLi
   }
 
   // permet d'afficher le formulaire de création de commentaire suite à un clic sur le bouton 'Répondre'
+  // test sur user.droits pour interdire la création de comments pour l'admin
   const reply = () => {
     if (user.udroits === 0) setIsReplying(true)
   }
