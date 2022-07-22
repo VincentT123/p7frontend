@@ -13,3 +13,8 @@ Avant de lancer p7frontend, il faudra copier, dans le dossier créé précédemm
 Enfin, pour exécuter p7frontend : avec la console de commande, dans le dossier créé précédemment, entrer 'npm start'.
 
 Note : certaines consoles de commandes tiennent compte des majuscules saisies, d'autres non. Ainsi, lorsque vous naviguez avec GIT bash, veillez à saisir les noms de dossiers correctement, par exemple pour une installation dans le dossier "Documents" de windows : "cd Documents" et non "cd documents". Sinon, un pop-up de warning lié au module Eslint de React peut apparaître au lancement de l'application dans la fenêtre du navigateur...
+
+Versions des logiciels utilisés :
+- GIT : 2.34.1.windows.1
+- node.js : v16.14.2
+- React : 18.1.0
